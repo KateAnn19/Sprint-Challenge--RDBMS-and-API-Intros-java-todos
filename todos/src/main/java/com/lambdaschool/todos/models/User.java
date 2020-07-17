@@ -25,8 +25,7 @@ public class User extends Auditable
     /**
      * The username (String). Cannot be null and must be unique
      */
-    @Column(nullable = false,
-        unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
     /**
@@ -39,10 +38,13 @@ public class User extends Auditable
     /**
      * Primary email account of user. Could be used as the userid. Cannot be null and must be unique.
      */
-    @Column(nullable = false,
-        unique = true)
+    @Column(nullable = false, unique = true)
     @Email
     private String primaryemail;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) //user inside todo
+    @JsonIgnoreProperties(value = "user", allowSetters = true)
+    private List<Todos> todos = new ArrayList<>();
 
     /**
      * Default constructor used primarily by the JPA.
@@ -69,6 +71,18 @@ public class User extends Auditable
         setPassword(password);
         this.primaryemail = primaryemail;
     }
+
+
+    public List<Todos> getTodos()
+    {
+        return todos;
+    }
+
+    public void setTodos(List<Todos> todos)
+    {
+        this.todos = todos;
+    }
+
 
     /**
      * Getter for userid

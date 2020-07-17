@@ -1,5 +1,8 @@
 package com.lambdaschool.todos;
 
+import com.github.javafaker.Faker;
+import com.github.javafaker.service.FakeValuesService;
+import com.github.javafaker.service.RandomService;
 import com.lambdaschool.todos.models.Todos;
 import com.lambdaschool.todos.models.User;
 import com.lambdaschool.todos.services.UserService;
@@ -7,6 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * SeedData puts both known and random data into the database. It implements CommandLineRunner.
@@ -23,6 +31,12 @@ public class SeedData implements CommandLineRunner
      */
     @Autowired
     UserService userService;
+
+    /**
+     * A Random generator is needed to randomly generate faker data.
+     */
+    private Random random = new Random();
+
 
     /**
      * Generates test, seed data for our application
@@ -76,5 +90,37 @@ public class SeedData implements CommandLineRunner
                            "password",
                            "misskitty@school.lambda");
         userService.save(u5);
+
+
+        // using JavaFaker Add in 100 more random users each with a random number (0 - 3)
+        // of random todos. The todos descriptions should be something random as well.
+        // For my example, I picked Pokemon names!
+        // https://www.baeldung.com/java-faker
+        // https://www.baeldung.com/regular-expressions-java
+
+        FakeValuesService fakeValuesService = new FakeValuesService(new Locale("en-US"), new RandomService());
+        Faker nameFaker = new Faker(new Locale("en-US"));
+        // this section gets a unique list of names
+
+        for(int i = 0; i < 100; i++)
+        {
+            new User();
+            User fakeUser;
+
+            fakeUser = new User(nameFaker.name().username(), "password", nameFaker.internet().emailAddress());
+
+
+            int randomNumber = random.nextInt(3) + 1; // random number 1 through 10
+            for (int j = 0; j < randomNumber; j++)
+            {
+                fakeUser.getTodos().add(new Todos(fakeUser, nameFaker.harryPotter().quote()));
+            }
+
+            //todos
+            //fakeUser.getTodos().add(new Todos();
+
+            userService.save(fakeUser);
+        }
+
     }
 }
